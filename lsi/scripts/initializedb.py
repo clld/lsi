@@ -1,6 +1,7 @@
 import itertools
 import collections
 
+from pyclts import CLTS
 from pycldf import Sources
 from clldutils.misc import nfilter
 from clldutils.color import qualitative_colors
@@ -25,8 +26,9 @@ def iteritems(cldf, t, *cols):
 
 
 def main(args):
-
     assert args.glottolog, 'The --glottolog option is required!'
+
+    clts = CLTS(input('Path to cldf-clts/clts:'))
 
     data = Data()
     data.add(
@@ -44,7 +46,6 @@ def main(args):
             'license_name': 'Creative Commons Attribution 4.0 International License'},
 
     )
-
 
     contrib = data.add(
         common.Contribution,
@@ -78,7 +79,10 @@ def main(args):
             id=param['id'],
             name='{} [{}]'.format(param['name'], param['id']),
         )
+
+    inventories = collections.defaultdict(set)
     for form in iteritems(args.cldf, 'FormTable', 'id', 'form', 'languageReference', 'parameterReference', 'source'):
+        inventories[form['languageReference']] = inventories[form['languageReference']].union(form['Segments'])
         vsid = (form['languageReference'], form['parameterReference'])
         vs = data['ValueSet'].get(vsid)
         if not vs:
@@ -100,6 +104,10 @@ def main(args):
             name=form['form'],
             valueset=vs,
         )
+    for lid, inv in inventories.items():
+        inv = [clts.bipa[c] for c in inv]
+        data['Variety'][lid].update_jsondata(
+            inventory=[(str(c), c.name) for c in inv if hasattr(c, 'name')])
 
     for (vsid, sid), pages in refs.items():
         DBSession.add(common.ValueSetReference(
