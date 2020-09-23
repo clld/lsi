@@ -1,8 +1,7 @@
-import collections
-
 from pyramid.config import Configurator
 
 from clld_glottologfamily_plugin import util
+from clld_glottologfamily_plugin.util import ISOLATES_ICON
 
 from clld.interfaces import IMapMarker, IValueSet, IValue, IDomainElement
 from clldutils.svg import pie, icon, data_url
@@ -18,7 +17,7 @@ class LanguageByFamilyMapMarker(util.LanguageByFamilyMapMarker):
         if IValueSet.providedBy(ctx):
             if ctx.language.family:
                 return data_url(icon(ctx.language.family.jsondata['icon']))
-            return data_url(icon(req.registry.settings.get('clld.isolates_icon', util.ISOLATES_ICON)))
+            return data_url(icon(req.registry.settings.get('clld.isolates_icon', ISOLATES_ICON)))
     
         return super(LanguageByFamilyMapMarker, self).__call__(ctx, req)
 
