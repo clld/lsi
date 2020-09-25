@@ -1,9 +1,10 @@
 import itertools
 import collections
 
+from nameparser import HumanName
 from pyclts import CLTS
 from pycldf import Sources
-from clldutils.misc import nfilter
+from clldutils.misc import nfilter, slug
 from clldutils.color import qualitative_colors
 from clld.cliutil import Data, bibtex2source
 from clld.db.meta import DBSession
@@ -28,15 +29,14 @@ def iteritems(cldf, t, *cols):
 def main(args):
     assert args.glottolog, 'The --glottolog option is required!'
 
-    clts = CLTS(input('Path to cldf-clts/clts:'))
-
+    clts = CLTS(input('Path to cldf-clts/clts:') or '../../cldf-clts/clts')
     data = Data()
-    data.add(
+    ds = data.add(
         common.Dataset,
         lsi.__name__,
         id=lsi.__name__,
+        name='The Comparative Vocabularies of the "Linguistic Survey of India" Online',
         domain='lsi.clld.org',
-
         publisher_name="Max Planck Institute for the Science of Human History",
         publisher_place="Jena",
         publisher_url="http://www.shh.mpg.de",
@@ -46,6 +46,13 @@ def main(args):
             'license_name': 'Creative Commons Attribution 4.0 International License'},
 
     )
+
+    for i, name in enumerate(['Taraka Rama', 'Robert Forkel', 'Johann-Mattis List']):
+        common.Editor(
+            dataset=ds,
+            ord=i,
+            contributor=common.Contributor(id=slug(HumanName(name).last), name=name)
+        )
 
     contrib = data.add(
         common.Contribution,
@@ -64,6 +71,9 @@ def main(args):
             latitude=lang['latitude'],
             longitude=lang['longitude'],
             glottocode=lang['glottocode'],
+            order=int(lang['Order']),
+            number=lang['NumberInSource'],
+            family_in_source=lang['FamilyInSource'],
         )
 
     for rec in bibtex.Database.from_file(args.cldf.bibpath):
@@ -78,6 +88,7 @@ def main(args):
             param['id'],
             id=param['id'],
             name='{} [{}]'.format(param['name'], param['id']),
+            pages=param['PageNumber'],
         )
 
     inventories = collections.defaultdict(set)
