@@ -57,3 +57,9 @@ class Concept(CustomModelMixin, common.Parameter):
                     str(number + 42).rjust(3, '0'))
             except:
                 pass
+
+
+@implementer(interfaces.IValue)
+class Form(CustomModelMixin, common.Value):
+    pk = Column(Integer, ForeignKey('value.pk'), primary_key=True)
+    segments = Column(Unicode)

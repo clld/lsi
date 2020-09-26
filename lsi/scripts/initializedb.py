@@ -109,10 +109,11 @@ def main(args):
             sid, pages = Sources.parse(ref)
             refs[(vsid, sid)].append(pages)
         data.add(
-            common.Value,
+            models.Form,
             form['id'],
             id=form['id'],
             name=form['form'],
+            segments=' '.join(form['Segments']),
             valueset=vs,
         )
     for lid, inv in inventories.items():
