@@ -88,6 +88,8 @@ def main(args):
             param['id'],
             id=param['id'],
             name='{} [{}]'.format(param['name'], param['id']),
+            description=param['Concepticon_Gloss'],
+            concepticon_id=param['concepticonReference'],
             pages=param['PageNumber'],
         )
 
@@ -113,6 +115,7 @@ def main(args):
             form['id'],
             id=form['id'],
             name=form['form'],
+            description=''.join(form['Segments']).replace('+', ' '),
             segments=' '.join(form['Segments']),
             valueset=vs,
         )
