@@ -30,6 +30,7 @@ class LanguageByFamilyMapMarker(util.LanguageByFamilyMapMarker):
 def main(global_config, **settings):
     """ This function returns a Pyramid WSGI application.
     """
+    settings.update(**{'clld.isolates_icon': 'dff6600'})
     config = Configurator(settings=settings)
     config.include('clld.web.app')
 
