@@ -38,10 +38,12 @@ ${util.language_meta()}
                 <caption>Other phonemes</caption>
                 <tbody>
                     % for seg in uncovered:
-                        <tr>
-                            <th>${seg.sound_bipa}</th>
-                            <td>${seg.sound_name}</td>
-                        </tr>
+                        % if seg.sound_bipa != '+':
+                            <tr>
+                                <th>${seg.sound_bipa}</th>
+                                <td>${seg.sound_name}</td>
+                            </tr>
+                        % endif
                     % endfor
                 </tbody>
             </table>

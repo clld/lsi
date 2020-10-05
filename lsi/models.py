@@ -39,7 +39,7 @@ class Variety(CustomModelMixin, common.Language, HasFamilyMixin):
             sound_bipa=k,
             sound_name=v,
             href='https://clts.clld.org/parameters/{}'.format(v.replace(' ', '_')),
-        ) for k, v in self.jsondata['inventory']]
+        ) for k, v in self.jsondata['inventory'] if v]
 
 
 @implementer(interfaces.IParameter)
