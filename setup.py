@@ -20,6 +20,7 @@ setup(
     zip_safe=False,
     install_requires=[
         'clld',  # >=7.0
+        'clldmpg',
         'clld-glottologfamily-plugin>=4.0',
         'pyglottolog',
         'pyclts>=2.1'
@@ -28,7 +29,7 @@ setup(
 extras_require={
         'dev': ['flake8', 'waitress'],
         'test': [
-            'mock',
+            'psycopg2',
             'pytest>=5.4',
             'pytest-clld',
             'pytest-mock',
