@@ -1,35 +1,24 @@
-import itertools
 import collections
 
 from nameparser import HumanName
-from pyclts import CLTS
 from pycldf import Sources
 from clldutils.misc import nfilter, slug
-from clldutils.color import qualitative_colors
 from clld.cliutil import Data, bibtex2source
 from clld.db.meta import DBSession
 from clld.db.models import common
 from clld.lib import bibtex
 
 from clld_glottologfamily_plugin.util import load_families
-
+from clld_ipachart_plugin.util import load_inventories, clts_from_input
 
 import lsi
 from lsi import models
 
 
-def iteritems(cldf, t, *cols):
-    cmap = {cldf[t, col].name: col for col in cols}
-    for item in cldf[t]:
-        for k, v in cmap.items():
-            item[v] = item[k]
-        yield item
-
-
 def main(args):
     assert args.glottolog, 'The --glottolog option is required!'
 
-    clts = CLTS(input('Path to cldf-clts/clts:') or '../../cldf-clts/clts')
+    clts = clts_from_input('../../cldf-clts/clts-data')
     data = Data()
     ds = data.add(
         common.Dataset,
@@ -47,6 +36,7 @@ def main(args):
 
     )
 
+    # FIXME: read from CONTRIBUTORS.md instead?
     for i, name in enumerate(['Taraka Rama', 'Robert Forkel', 'Johann-Mattis List']):
         common.Editor(
             dataset=ds,
@@ -62,7 +52,8 @@ def main(args):
         description=args.cldf.properties.get('dc:bibliographicCitation'),
     )
 
-    for lang in iteritems(args.cldf, 'LanguageTable', 'id', 'glottocode', 'name', 'latitude', 'longitude'):
+    for lang in args.cldf.iter_rows(
+            'LanguageTable', 'id', 'glottocode', 'name', 'latitude', 'longitude'):
         data.add(
             models.Variety,
             lang['id'],
@@ -82,7 +73,7 @@ def main(args):
     refs = collections.defaultdict(list)
 
 
-    for param in iteritems(args.cldf, 'ParameterTable', 'id', 'concepticonReference', 'name'):
+    for param in args.cldf.iter_rows('ParameterTable', 'id', 'concepticonReference', 'name'):
         data.add(
             models.Concept,
             param['id'],
@@ -93,9 +84,8 @@ def main(args):
             pages=param['PageNumber'],
         )
 
-    inventories = collections.defaultdict(set)
-    for form in iteritems(args.cldf, 'FormTable', 'id', 'form', 'languageReference', 'parameterReference', 'source'):
-        inventories[form['languageReference']] = inventories[form['languageReference']].union(form['Segments'])
+    for form in args.cldf.iter_rows(
+            'FormTable', 'id', 'form', 'languageReference', 'parameterReference', 'source'):
         vsid = (form['languageReference'], form['parameterReference'])
         vs = data['ValueSet'].get(vsid)
         if not vs:
@@ -119,10 +109,8 @@ def main(args):
             segments=' '.join(form['Segments']),
             valueset=vs,
         )
-    for lid, inv in inventories.items():
-        inv = [clts.bipa[c] for c in inv]
-        data['Variety'][lid].update_jsondata(
-            inventory=[(str(c), c.name) for c in inv if hasattr(c, 'name')])
+
+    load_inventories(args.cldf, clts, data['Variety'])
 
     for (vsid, sid), pages in refs.items():
         DBSession.add(common.ValueSetReference(
@@ -137,7 +125,6 @@ def main(args):
         isolates_icon='tcccccc',
         strict=False,
     )
-
 
 
 def prime_cache(args):

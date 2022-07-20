@@ -19,9 +19,10 @@ setup(
     include_package_data=True,
     zip_safe=False,
     install_requires=[
-        'clld',  # >=7.0
+        'clld>=9.2.1',
         'clldmpg',
         'clld-glottologfamily-plugin>=4.0',
+        'clld-ipachart-plugin>=0.2',
         'pyglottolog',
         'pyclts>=2.1'
         'clldmpg',
