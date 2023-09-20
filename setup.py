@@ -35,6 +35,7 @@ extras_require={
             'pytest-clld',
             'pytest-mock',
             'pytest-cov',
+            'pytest-env',
             'coverage>=4.2',
             'selenium',
             'zope.component>=3.11.0',

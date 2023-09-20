@@ -30,9 +30,16 @@
 
 <h2>${_('Parameter')} ${ctx.name}</h2>
 
-% if ctx.description:
-<p>${ctx.description}</p>
+% if ctx.concepticon_id:
+    <p>
+        Related concept set in Concepticon:
+        ${u.concepticon.link(req, ctx.concepticon_id, label=ctx.description)}
+    </p>
 % endif
+<p>
+    Corresponding book pages at DSAL:
+    ${h.external_link(ctx.dsal_url)}
+</p>
 
 <div style="clear: both" id="map-container">
     <h4 style="float: right">

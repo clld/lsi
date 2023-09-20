@@ -34,16 +34,11 @@ class Concept(CustomModelMixin, common.Parameter):
     pk = Column(Integer, ForeignKey('parameter.pk'), primary_key=True)
     concepticon_id = Column(Unicode)
     pages = Column(Unicode)
+    dsal_url = Column(Unicode)
 
     @property
     def scans(self):
-        for number in self.pages.split('-'):
-            try:
-                number = int(number)
-                yield 'https://dsal.uchicago.edu/books/lsi/images/lsi-v1-2-{}.jpg'.format(
-                    str(number + 42).rjust(3, '0'))
-            except:
-                pass
+        return self.jsondata['scans']
 
 
 @implementer(interfaces.IValue)

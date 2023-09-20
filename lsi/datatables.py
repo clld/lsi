@@ -14,13 +14,31 @@ from lsi import models
 
 
 class Words(Values):
+    def base_query(self, query):
+        query = Values.base_query(self, query)
+        if self.parameter:
+            query = query.outerjoin(models.Variety.family)
+
+        return query
+
     def col_defs(self):
         if self.parameter:
             return [
-                LinkCol(self,
-                        'language',
-                        model_col=common.Language.name,
-                        get_object=lambda i: i.valueset.language),
+                LinkCol(
+                    self,
+                    'language',
+                    model_col=common.Language.name,
+                    get_object=lambda i: i.valueset.language),
+                FamilyCol(
+                    self,
+                    'family',
+                    models.Variety,
+                    get_object=lambda i: i.valueset.language),
+                #
+                # Add
+                # - language family
+                # - ID order
+                #
                 Col(self, 'name', sTitle='Orthography'),
                 Col(self, 'description', sTitle='IPA'),
                 Col(self, 'segments', model_col=models.Form.segments),

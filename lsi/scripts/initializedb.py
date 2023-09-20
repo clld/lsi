@@ -25,10 +25,11 @@ def main(args):
         lsi.__name__,
         id=lsi.__name__,
         name='The Comparative Vocabularies of the "Linguistic Survey of India" Online',
+        description=args.cldf.properties.get('dc:bibliographicCitation'),
         domain='lsi.clld.org',
         publisher_name="Max Planck Institute for Evolutionary Anthropology",
         publisher_place="Leipzig",
-        publisher_url="http://www.eva.mpg.de",
+        publisher_url="https://www.eva.mpg.de",
         license="http://creativecommons.org/licenses/by/4.0/",
         jsondata={
             'license_icon': 'cc-by.png',
@@ -72,8 +73,10 @@ def main(args):
 
     refs = collections.defaultdict(list)
 
-
-    for param in args.cldf.iter_rows('ParameterTable', 'id', 'concepticonReference', 'name'):
+    scans = {r['id']: r['downloadUrl'].unsplit()
+             for r in args.cldf.iter_rows('MediaTable', 'id', 'downloadUrl')}
+    for param in args.cldf.iter_rows(
+            'ParameterTable', 'id', 'concepticonReference', 'name', 'mediaReference'):
         data.add(
             models.Concept,
             param['id'],
@@ -81,7 +84,9 @@ def main(args):
             name='{} [{}]'.format(param['name'], param['id']),
             description=param['Concepticon_Gloss'],
             concepticon_id=param['concepticonReference'],
+            dsal_url=param['DSAL_URL'],
             pages=param['PageNumber'],
+            jsondata={'scans': [scans[scan] for scan in param['mediaReference']]}
         )
 
     for form in args.cldf.iter_rows(

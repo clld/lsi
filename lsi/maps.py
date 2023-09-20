@@ -6,7 +6,6 @@ class WordMap(ParameterMap):
         return {
             'show_labels': True,
             'hash': False,
-            'base_layer': 'Esri.WorldPhysical',
         }
 
 
