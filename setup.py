@@ -24,7 +24,7 @@ setup(
         'clld-glottologfamily-plugin>=4.0',
         'clld-ipachart-plugin>=0.2',
         'pyglottolog',
-        'pyclts>=2.1'
+        'pyclts>=2.1',
         'clldmpg',
 ],
 extras_require={
