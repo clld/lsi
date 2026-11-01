@@ -18,7 +18,7 @@ from lsi import models
 def main(args):
     assert args.glottolog, 'The --glottolog option is required!'
 
-    clts = clts_from_input('../../cldf-clts/clts-data')
+    clts = clts_from_input('../clts')
     data = Data()
     ds = data.add(
         common.Dataset,
